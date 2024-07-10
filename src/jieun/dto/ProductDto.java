@@ -1,6 +1,8 @@
 package jieun.dto;
 
-public class ProductDto {
+import java.io.Serializable;
+
+public class ProductDto implements Serializable {
     private static long cnt = 0;
     private long id;
     private String name;
