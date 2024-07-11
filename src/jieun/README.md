@@ -20,8 +20,8 @@
 
 ---
 #### Exception
-  - 메뉴에 없는 번호 입력
-  - 없는 상품 번호 입력
-  - 상품 정보 null 입력
-  - 0 ~ 999,999 외 상품 가격
-  - 0 ~ 999 외 상품 재고
+  - 메뉴에 없는 번호 입력 (`MENU_OPTION_NOT_FOUND_EXCEPTION`)
+  - 없는 상품 번호 입력 (`PRODUCT_NOT_FOUND_EXCEPTION`)
+  - 상품 정보 null 입력 (`NULL_PRODUCT_INFO_EXCEPTION`)
+  - 0 ~ 999,999 외 상품 가격 (`PRODUCT_PRICE_OUT_OF_RANGE_EXCEPTION`)
+  - 0 ~ 999 외 상품 재고 (`PRODUCT_STOCK_OUT_OF_RANGE_EXCEPTIO`)

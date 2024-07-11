@@ -42,13 +42,21 @@ public class ProductServer {
                 try {
                     while (true) {
 
-                        // 1. server -> client (productList)
+                        /*
+                         * 1번
+                         * server -> client (productList)
+                         * 상품 목록을 Client로 보내기
+                         */
                         List<String> productList = serverService.getProductList();
                         ProductDataHandler productDataHandler = new ProductDataHandler(productList);
 
                         clientWriter.println(productDataHandler.toString());
 
-                        // 2. client -> server (menuData)
+                        /*
+                         * 2번
+                         * client -> server (menuData)
+                         * Client에서 보낸 user가 입력한 정보 받아서 처리하기
+                         */
                         String menuDataString = clientReader.readLine();
                         if (menuDataString == null || menuDataString.equals("END_OF_MENU_DATA")) {
                             break;
@@ -65,7 +73,11 @@ public class ProductServer {
                             case 4 -> serverService.exitApplication();
                         }
 
-                        // 3. server -> client (result)
+                        /*
+                         * 3번
+                         * server -> client (result)
+                         * 2번의 처리 결과 Client로 보내기
+                         */
                         StatusHandler statusHandler = new StatusHandler();
                         statusHandler.setStatus("success");
                         if (menuOption == 4) {
