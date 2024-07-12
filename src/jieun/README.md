@@ -25,3 +25,4 @@
   - 상품 정보 null 입력 (`NULL_PRODUCT_INFO_EXCEPTION`)
   - 0 ~ 999,999 외 상품 가격 (`PRODUCT_PRICE_OUT_OF_RANGE_EXCEPTION`)
   - 0 ~ 999 외 상품 재고 (`PRODUCT_STOCK_OUT_OF_RANGE_EXCEPTIO`)
+  - 상품 번호 / 가격 / 재고 숫자 입력 X (`INVALID_INPUT_TYPE_EXCEPTION`)

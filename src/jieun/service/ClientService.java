@@ -12,6 +12,7 @@ import jieun.util.MenuText;
 
 
 public class ClientService {
+
     private static final int FIRST_MENU = 1;
     private static final int LAST_MENU = 4;
     private static final int MAX_PRICE = 999999;
@@ -20,8 +21,9 @@ public class ClientService {
     private static final int MIN_STOCK = 0;
     private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     private static List<String> productList;
-    private static int inputMenuNum;
+    private static int menuNum;
     private static MenuDataHandler menuDataHandler;
+
     public ClientService() {
         this.menuDataHandler = new MenuDataHandler();
     }
@@ -59,13 +61,16 @@ public class ClientService {
      * 메뉴 번호 선택
      */
     public void selectMenuOption() throws IOException {
+        String inputMenu;
         System.out.print(MenuText.SELECT.getText());
-        inputMenuNum = Integer.parseInt(br.readLine());
+        inputMenu = br.readLine();
+        validateIntegerInputs(inputMenu);
+        menuNum = Integer.parseInt(inputMenu);
         validateMenuNum();
 
-        menuDataHandler.setMenuOption(inputMenuNum);
+        menuDataHandler.setMenuOption(menuNum);
 
-        switch (inputMenuNum) {
+        switch (menuNum) {
             case 1 -> createProduct();
             case 2 -> updateProduct();
             case 3 -> deleteProduct();
@@ -77,15 +82,20 @@ public class ClientService {
      * 메뉴: 1. Create (상품 생성)
      * 입력: 상품 이름, 상품 가격, 상품 재고
      */
-    public void createProduct() throws IOException{
+    public void createProduct() throws IOException {
         System.out.println(MenuText.MENU1.getText());
         System.out.print("상품 이름: ");
         String productName = br.readLine();
         System.out.print("상품 가격: ");
-        int productPrice = Integer.parseInt(br.readLine());
-        validateProductPrice(productPrice);
+        String inputPrice = br.readLine();
         System.out.print("상품 재고: ");
-        int productStock = Integer.parseInt(br.readLine());
+        String inputStock = br.readLine();
+
+        validateIntegerInputs(inputPrice, inputStock);
+
+        int productPrice = Integer.parseInt(inputPrice);
+        validateProductPrice(productPrice);
+        int productStock = Integer.parseInt(inputStock);
         validateProductStock(productStock);
 
         menuDataHandler.setName(productName);
@@ -97,18 +107,24 @@ public class ClientService {
      * 메뉴: 2. Update (상품 수정)
      * 입력: 상품 번호, 상품 이름, 상품 가격, 상품 재고
      */
-    public void updateProduct() throws IOException{
+    public void updateProduct() throws IOException {
         System.out.println(MenuText.MENU2.getText());
         System.out.print("상품 번호: ");
-        long productId = Long.parseLong(br.readLine());
+        String inputId = br.readLine();
 
         System.out.print("이름 변경: ");
         String updatedProductName = br.readLine();
         System.out.print("가격 변경: ");
-        int updatedProductPrice = Integer.parseInt(br.readLine());
-        validateProductPrice(updatedProductPrice);
+        String inputPrice = br.readLine();
         System.out.print("재고 변경: ");
-        int updatedProductStock = Integer.parseInt(br.readLine());
+        String inputStock = br.readLine();
+
+        validateIntegerInputs(inputId, inputPrice, inputStock);
+
+        long productId = Long.parseLong(inputId);
+        int updatedProductPrice = Integer.parseInt(inputPrice);
+        validateProductPrice(updatedProductPrice);
+        int updatedProductStock = Integer.parseInt(inputStock);
         validateProductStock(updatedProductStock);
 
         menuDataHandler.setId(productId);
@@ -124,7 +140,11 @@ public class ClientService {
     public void deleteProduct() throws IOException {
         System.out.println(MenuText.MENU3.getText());
         System.out.print("상품 번호: ");
-        long productId = Long.parseLong(br.readLine());
+        String inputId = br.readLine();
+
+        validateIntegerInputs(inputId);
+
+        long productId = Long.parseLong(inputId);
 
         menuDataHandler.setId(productId);
     }
@@ -141,7 +161,7 @@ public class ClientService {
      * 메뉴 번호: 1 ~ 4
      */
     public void validateMenuNum() {
-        if (inputMenuNum < FIRST_MENU || LAST_MENU < inputMenuNum) {
+        if (menuNum < FIRST_MENU || LAST_MENU < menuNum) {
             throw new ProductException(MENU_OPTION_NOT_FOUND_EXCEPTION);
         }
     }
@@ -163,6 +183,20 @@ public class ClientService {
     public void validateProductStock(int productStock) {
         if (productStock < MIN_STOCK || MAX_STOCK < productStock) {
             throw new ProductException(PRODUCT_STOCK_OUT_OF_RANGE_EXCEPTIO);
+        }
+    }
+
+    /*
+     * 입력된 문자열이 유효한 정수인지 검사
+     */
+    public void validateIntegerInputs(String... input) {
+        try {
+            for (String s : input) {
+                Integer.parseInt(s);
+            }
+
+        } catch (NumberFormatException e) {
+            throw new ProductException(INVALID_INPUT_TYPE_EXCEPTION);
         }
     }
 }
