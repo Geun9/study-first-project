@@ -5,22 +5,31 @@ import java.util.List;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-public class ProductDataHandler implements Serializable {
+public class DataHandler implements Serializable {
     private JSONObject productField;
-    public ProductDataHandler() {
+    public DataHandler() {
 
     }
-    public ProductDataHandler(List<String> productList) {
+    public DataHandler(String status) {
+        productField = new JSONObject();
+        productField.put("status", status);
+    }
+
+    public DataHandler(String status, List<String> productList) {
         productField = new JSONObject();
         JSONArray productArray = new JSONArray();
         for (String product : productList) {
             productArray.add(product);
         }
+        productField.put("status", status);
         productField.put("products", productArray);
     }
 
     public JSONObject getProductField() {
         return productField;
+    }
+    public void setStatus(String status) {
+        productField.put("status", status);
     }
 
     @Override
