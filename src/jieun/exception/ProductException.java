@@ -9,9 +9,4 @@ public class ProductException extends RuntimeException{
         super(error.getMsg());
         this.error = error;
 }
-
-    public String getError() {
-        return "[ErrorCode]\n" + error.getCode() +
-            "\n" + "[ErrorMessage]\n"+ error.getMsg();
-    }
 }

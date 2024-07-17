@@ -15,8 +15,7 @@ import jieun.service.ServerService;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import jieun.util.Casting;
-import jieun.util.ProductDataHandler;
-import jieun.util.StatusHandler;
+import jieun.util.DataHandler;
 
 /**
  * Thread vs Runnable
@@ -41,6 +40,8 @@ import jieun.util.StatusHandler;
 public class ProductServer {
 
     private static final int PORT = 8080;
+    private static DataHandler dataHandler;
+    private static ServerService serverService;
 
     public static void main(String[] args) {
         /**
@@ -90,7 +91,7 @@ public class ProductServer {
         }
         @Override
         public void run() {
-            ServerService serverService = new ServerService();
+            serverService = new ServerService();
             try {
                 /*
                  * Initialize the streams
@@ -107,81 +108,84 @@ public class ProductServer {
                      * server -> client (productList)
                      * 상품 목록을 Client로 보내기
                      */
-                    List<String> productList = serverService.getProductList();
-                    ProductDataHandler productDataHandler = new ProductDataHandler(
-                        productList);
-
-                    clientWriter.println(productDataHandler.toString());
+                    sendProductListToClient(clientWriter);
 
                     /**
                      * 2번
                      * client -> server (menuData)
                      * Client에서 보낸 user가 입력한 정보 받아서 처리하기
                      */
-                    String menuDataString = clientReader.readLine();
-
-                    System.out.println(
-                        getCurrentTime()
-                        + "[" + Thread.currentThread().getName() + "] "
-                        + menuDataString
-                    );
-
-                    if (menuDataString == null || menuDataString.equals(
-                        "END_OF_MENU_DATA")) {
-                        break;
-                    }
-                    JSONObject jsonData = Casting.toJson(menuDataString);
-
-                    int menuOption = Integer.parseInt(jsonData.get("menu").toString());
-                    JSONObject productData = (JSONObject) (jsonData.get("data"));
-
-                    switch (menuOption) {
-                        case 1 -> serverService.createProduct(productData);
-                        case 2 -> serverService.updateProduct(productData);
-                        case 3 -> serverService.deleteProduct(productData);
-                        case 4 -> serverService.exitApplication();
-                    }
+                    processMenuDataFromClient(clientReader);
 
                     /**
                      * 3번
                      * server -> client (result)
                      * 2번의 처리 결과 Client로 보내기
                      */
-                    StatusHandler statusHandler = new StatusHandler();
-                    statusHandler.setStatus("success");
-                    if (menuOption == 4) {
-                        statusHandler.setExit("EXIT");
-                    }
-                    clientWriter.println(statusHandler.toString());
+                    clientWriter.println(dataHandler.toString());
 
-                    /*
-                     * 4. Check exit condition
-                     */
-                    String exitCommand = clientReader.readLine();
-
-                    System.out.println(
-                        getCurrentTime()
-                            + "[" + Thread.currentThread().getName() + "] "
-                            + exitCommand
-                    );
-
-                    if (exitCommand.equalsIgnoreCase("EXIT")) {
-                        break;
-                    }
                 }
             } catch (IOException e) {
+                dataHandler.setStatus("fail");
                 System.out.println(
                     getCurrentTime()
                         + " Error occurred during communication with the client: "
                         + e.getMessage());
+            }
+            System.out.println(getCurrentTime() + " Client connection closed.");
+
+        }
+
+        /**
+         * 1번
+         * server -> client (productList)
+         * 상품 목록을 Client로 보내기
+         */
+        void sendProductListToClient(PrintWriter clientWriter) {
+            List<String> productList = serverService.getProductList();
+            dataHandler = new DataHandler("success", productList);
+            clientWriter.println(dataHandler.toString());
+        }
+
+        /**
+         * 2번
+         * client -> server (menuData)
+         * Client에서 보낸 user가 입력한 정보 받아서 처리하기
+         */
+        void processMenuDataFromClient(BufferedReader clientReader) throws IOException {
+            try {
+                String menuDataString = clientReader.readLine();
+
+                System.out.println(
+                    getCurrentTime()
+                        + "[" + Thread.currentThread().getName() + "] "
+                        + menuDataString
+                );
+
+                JSONObject jsonData = Casting.toJson(menuDataString);
+
+                int menuOption = Integer.parseInt(jsonData.get("menu").toString());
+                JSONObject productData = (JSONObject) (jsonData.get("data"));
+
+                switch (menuOption) {
+                    case 1 -> serverService.createProduct(productData);
+                    case 2 -> serverService.updateProduct(productData);
+                    case 3 -> serverService.deleteProduct(productData);
+                    case 4 -> {
+                        serverService.exitApplication();
+                        clientSocket.close();
+                    }
+                }
+
+                dataHandler = new DataHandler("success");
+
             } catch (ParseException e) {
+                dataHandler.setStatus("fail");
                 System.out.println(
                     getCurrentTime() + " Error occurred while parsing JSON data: "
                         + e.getMessage());
+                throw new RuntimeException(e);
             }
-//        clientSocket.close();
-            System.out.println(getCurrentTime() + " Client connection closed.");
-
         }
     }
 

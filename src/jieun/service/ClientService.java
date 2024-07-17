@@ -13,12 +13,9 @@ import jieun.util.MenuText;
 
 public class ClientService {
     private static final String MENU_NUMBER = "^[1-4]";
+    private static final String NAME = "^[a-zA-Z0-9ㄱ-힣]{1,10}";
     private static final String PRICE = "^\\d{0,6}$";
     private static final String STOCK = "^\\d{0,3}$";
-    private static final String PRODUCT_ID_KEY = "id";
-    private static final String PRODUCT_NAME_KEY = "name";
-    private static final String PRODUCT_PRICE_KEY = "price";
-    private static final String PRODUCT_STOCK_KEY = "stock";
     private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     private static List<String> productList;
     private static int menuNum;
@@ -63,7 +60,9 @@ public class ClientService {
     public void selectMenuOption() throws IOException {
         System.out.print(MenuText.SELECT.getText());
         String inputMenu = br.readLine();
+
         menuNum = validateMenuNum(inputMenu);
+        menuDataHandler.setMenuOption(menuNum);
 
         switch (menuNum) {
             case 1 -> createProduct();
@@ -80,7 +79,8 @@ public class ClientService {
     public void createProduct() throws IOException {
         System.out.println(MenuText.MENU1.getText());
         System.out.print("상품 이름: ");
-        String productName = br.readLine();
+        String inputName = br.readLine();
+        String productName = validateProductName(inputName);
 
         System.out.print("상품 가격: ");
         String inputPrice = br.readLine();
@@ -89,9 +89,6 @@ public class ClientService {
         System.out.print("상품 재고: ");
         String inputStock = br.readLine();
         int productStock = validateProductStock(inputStock);
-
-//        validateIntegerInputs(inputPrice, inputStock);
-
 
         menuDataHandler.setName(productName);
         menuDataHandler.setPrice(productPrice);
@@ -119,8 +116,6 @@ public class ClientService {
         System.out.print("재고 변경: ");
         String inputStock = br.readLine();
         int updatedProductStock = validateProductStock(inputStock);
-
-//        validateIntegerInputs(inputId, inputPrice, inputStock);
 
         menuDataHandler.setId(productId);
         menuDataHandler.setName(updatedProductName);
@@ -154,11 +149,26 @@ public class ClientService {
      * 메뉴 번호: 1 ~ 4
      */
     public int validateMenuNum(String inputMenu) {
-        if (inputMenu.matches(MENU_NUMBER)) {
-            menuDataHandler.setMenuOption(menuNum);
-            return Integer.parseInt(inputMenu);
+        try {
+            if (inputMenu.matches(MENU_NUMBER)) {
+                return Integer.parseInt(inputMenu);
+            } else {
+                throw new ProductException(INVALID_MENU_OPTION);
+            }
+        } catch (NumberFormatException e) {
+            throw new ProductException(INVALID_MENU_OPTION);
+        }
+    }
+
+    /**
+     * 상품 이름 유효성 검사
+     * [0~9, a~z, A~Z, ㄱ~힣] 1~10
+     */
+    public String validateProductName(String inputName) {
+        if (inputName.matches(NAME)) {
+            return inputName;
         } else {
-            throw new ProductException(MENU_OPTION_NOT_FOUND_EXCEPTION);
+            throw new ProductException(INVALID_PRODUCT_NAME);
         }
     }
 
@@ -170,7 +180,7 @@ public class ClientService {
             long productId = Long.parseLong(inputId);
             return productId;
         } catch (NumberFormatException e) {
-            throw new ProductException(PRODUCT_ID_NOT_FOUND_EXCEPTION);
+            throw new ProductException(INVALID_PRODUCT_ID);
         }
     }
 
@@ -179,10 +189,14 @@ public class ClientService {
      * 상품 가격: 0 ~ 999,999
      */
     public int validateProductPrice(String inputPrice) {
-        if (inputPrice.matches(PRICE)) {
-            return Integer.parseInt(inputPrice);
-        } else {
-            throw new ProductException(PRODUCT_PRICE_OUT_OF_RANGE_EXCEPTION);
+        try {
+            if (inputPrice.matches(PRICE)) {
+                return Integer.parseInt(inputPrice);
+            } else {
+                throw new ProductException(INVALID_PRODUCT_PRICE);
+            }
+        } catch (NumberFormatException e) {
+            throw new ProductException(INVALID_PRODUCT_PRICE);
         }
     }
 
@@ -191,10 +205,14 @@ public class ClientService {
      * 상품 재고: 0 ~ 999
      */
     public int validateProductStock(String inputStock) {
-        if (inputStock.matches(STOCK)) {
-            return Integer.parseInt(inputStock);
-        } else {
-            throw new ProductException(PRODUCT_STOCK_OUT_OF_RANGE_EXCEPTIO);
+        try {
+            if (inputStock.matches(STOCK)) {
+                return Integer.parseInt(inputStock);
+            } else {
+                throw new ProductException(INVALID_PRODUCT_STOCK);
+            }
+        } catch (NumberFormatException e) {
+            throw new ProductException(INVALID_PRODUCT_STOCK);
         }
     }
 

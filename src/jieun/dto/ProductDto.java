@@ -51,7 +51,7 @@ public class ProductDto implements Serializable {
 
     @Override
     public String toString() {
-        String listFormat = String.format("%-6d%-20s%-15d%-10d", this.id, this.name, this.price, this.stock);
+        String listFormat = String.format("%-6d%-20s\t%-15d\t%-10d", this.id, this.name, this.price, this.stock);
         return listFormat;
     }
 }

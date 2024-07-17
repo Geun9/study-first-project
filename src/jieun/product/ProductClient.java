@@ -11,8 +11,6 @@ import java.net.Socket;
 import java.util.List;
 import jieun.exception.ProductException;
 import jieun.service.ClientService;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import jieun.util.MenuDataHandler;
 
@@ -36,13 +34,16 @@ public class ProductClient {
             serverWriter = new PrintWriter(socket.getOutputStream(), true);
 
             while (!isQuit) {
-                String isExit = "";
                 List<String> productList = productClient.receiveProductListFromServer();
 
                 productClient.sendMenuDataToServer(productList);
-                isExit = productClient.receiveResultFromServer();
-                productClient.checkExitCondition(isExit);
             }
+
+            // End of communication
+            System.out.println("Closing the connection.");
+
+            // Close socket
+            System.out.println("Connection closed.");
         } catch (ConnectException e) {
             e.printStackTrace();
             System.out.println("Connection error: " + e.getMessage());
@@ -63,7 +64,6 @@ public class ProductClient {
         String productDataString = serverReader.readLine();
 
         return parseProductList(productDataString);
-
     }
 
 
@@ -76,47 +76,23 @@ public class ProductClient {
         try {
             ClientService clientService = new ClientService();
             MenuDataHandler menuData = clientService.getProductData(productList);
+
             serverWriter.println(menuData.toString());
-            serverWriter.println("END_OF_MENU_DATA");
+
+            /**
+             * 3번
+             * server -> client (result)
+             * Server에서 보낸 처리 결과 받기
+             */
+            String statusResult = serverReader.readLine();
+
+            if (menuData.getMenuOption() == 4) {
+                isQuit = !isQuit;
+                socket.close();
+            }
         } catch (ProductException e) {
             System.out.println(e.getMessage());
             sendMenuDataToServer(productList);
         }
-    }
-
-
-    /**
-     * 3번
-     * server -> client (result)
-     * Server에서 보낸 처리 결과 받기
-     */
-    public String receiveResultFromServer() throws IOException, ParseException {
-        String statusResult = serverReader.readLine();
-        String isExit = "";
-        if (statusResult != null) {
-            JSONObject jsonData = (JSONObject) new JSONParser().parse(statusResult);
-            isExit = (String) jsonData.get("isExit");
-        }
-        return isExit;
-    }
-
-
-    /**
-     * 4번
-     * Check exit condition
-     * 3번에서 받은 결과에서 종료 요청 시, Client 프로그램 종료
-     */
-    public void checkExitCondition(String isExit) throws IOException {
-        if (isExit != null && isExit.equals("EXIT")) {
-//            serverWriter.println("exit");
-            isQuit = !isQuit;
-            socket.close();
-        }
-
-        // End of communication
-        System.out.println("Closing the connection.");
-
-        // Close socket
-        System.out.println("Connection closed.");
     }
 }
