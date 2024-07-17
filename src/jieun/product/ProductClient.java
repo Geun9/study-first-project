@@ -32,8 +32,7 @@ public class ProductClient {
             socket = new Socket(serverIp, 8080);
 
             // Initialize the streams
-            serverReader = new BufferedReader(
-                new InputStreamReader(socket.getInputStream()));
+            serverReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             serverWriter = new PrintWriter(socket.getOutputStream(), true);
 
             while (!isQuit) {
@@ -55,7 +54,7 @@ public class ProductClient {
         }
     }
 
-    /*
+    /**
      * 1번
      * server -> client (productList)
      * server에서 보낸 메뉴 목록 받기
@@ -68,7 +67,7 @@ public class ProductClient {
     }
 
 
-    /*
+    /**
      * 2번
      * client -> server (menuData)
      * user가 입력한 메뉴 번호, 추 정보를 Server로 보내기
@@ -86,7 +85,7 @@ public class ProductClient {
     }
 
 
-    /*
+    /**
      * 3번
      * server -> client (result)
      * Server에서 보낸 처리 결과 받기
@@ -102,7 +101,7 @@ public class ProductClient {
     }
 
 
-    /*
+    /**
      * 4번
      * Check exit condition
      * 3번에서 받은 결과에서 종료 요청 시, Client 프로그램 종료

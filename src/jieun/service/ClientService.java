@@ -19,6 +19,10 @@ public class ClientService {
     private static final int MIN_PRICE = 0;
     private static final int MAX_STOCK = 999;
     private static final int MIN_STOCK = 0;
+    private static final String PRODUCT_ID_KEY = "id";
+    private static final String PRODUCT_NAME_KEY = "name";
+    private static final String PRODUCT_PRICE_KEY = "price";
+    private static final String PRODUCT_STOCK_KEY = "stock";
     private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     private static List<String> productList;
     private static int menuNum;
@@ -35,7 +39,7 @@ public class ClientService {
         return menuDataHandler;
     }
 
-    /*
+    /**
      * 메뉴 정보 출력
      */
     public void displayMenuList() {
@@ -48,7 +52,7 @@ public class ClientService {
         System.out.println(MenuText.MENU.getText());
     }
 
-    /*
+    /**
      * 저장된 상품 List 출력
      */
     public void getProductList() {
@@ -57,7 +61,7 @@ public class ClientService {
         }
     }
 
-    /*
+    /**
      * 메뉴 번호 선택
      */
     public void selectMenuOption() throws IOException {
@@ -78,7 +82,7 @@ public class ClientService {
         }
     }
 
-    /*
+    /**
      * 메뉴: 1. Create (상품 생성)
      * 입력: 상품 이름, 상품 가격, 상품 재고
      */
@@ -103,7 +107,7 @@ public class ClientService {
         menuDataHandler.setStock(productStock);
     }
 
-    /*
+    /**
      * 메뉴: 2. Update (상품 수정)
      * 입력: 상품 번호, 상품 이름, 상품 가격, 상품 재고
      */
@@ -133,7 +137,7 @@ public class ClientService {
         menuDataHandler.setStock(updatedProductStock);
     }
 
-    /*
+    /**
      * 메뉴: 3. Delete (상품 삭제)
      * 입력: 상품 번호
      */
@@ -149,14 +153,14 @@ public class ClientService {
         menuDataHandler.setId(productId);
     }
 
-    /*
+    /**
      * 메뉴: 4. Exit (프로그램 종료)
      */
     public void exitApplication() {
         System.out.println(MenuText.MENU4.getText());
     }
 
-    /*
+    /**
      * 메뉴 번호 유효성 검사
      * 메뉴 번호: 1 ~ 4
      */
@@ -194,9 +198,9 @@ public class ClientService {
             for (String s : input) {
                 Integer.parseInt(s);
             }
-
         } catch (NumberFormatException e) {
             throw new ProductException(INVALID_INPUT_TYPE_EXCEPTION);
         }
     }
+
 }
